@@ -1,0 +1,47 @@
+- hosts: all          
+  tasks:
+          - copy:
+                  src: "/root/hadoop_softwares"
+                  dest: "/root"
+
+          - shell:
+                  cmd: "rpm -i /root/hadoop_softwares/jdk-8u171-linux-x64.rpm "
+                   
+          - shell:
+                  cmd: "rpm -i /root/hadoop_softwares/hadoop-1.2.1-1.x86_64.rpm --force"
+
+          - copy: 
+                  src: "/root/projects/core-site.txt"
+                  dest: "/etc/hadoop/core-site.xml"
+                  
+
+- hosts: 192.168.1.2
+  tasks:
+          - file: 
+                  path: /nodedir
+                  state: directory
+          - copy:
+                  src: "/root/projects/hdfs-site.txt"
+                  dest: "/etc/hadoop/hdfs-site.xml"
+                  
+                
+          - shell:
+                  cmd: "echo Y | hadoop namenode -format"
+
+          - shell:
+                  cmd: "hadoop-daemon.sh start namenode"
+
+- hosts: 192.168.1.47
+  tasks: 
+          - file: 
+                  path: /nodedir
+                  state: directory
+          - copy: 
+                  src: "/root/projects/hdfs-site.txt"
+                  dest: "/etc/hadoop/hdfs-site.xml"
+          - replace:
+                  path: /etc/hadoop/hdfs-site.xml
+                  regexp: 'dfs.name.dir'
+                  replace: 'dfs.data.dir'
+          - shell:
+                  cmd: "hadoop-daemon.sh start datanode" 
