@@ -1,0 +1,28 @@
+- hosts: 192.168.146.130
+  vars:
+          master_ip: "192.168.146.131"
+          data_dir: "/data"
+  tasks:
+          - copy:
+                  src: "/root/ansible_workspace/hadoop/hadoop_softwares"
+                  dest: "/root"
+
+          - shell:
+                  cmd: "rpm -i /root/hadoop_softwares/jdk-8u171-linux-x64.rpm "
+
+          - shell:
+                  cmd: "rpm -i /root/hadoop_softwares/hadoop-1.2.1-1.x86_64.rpm --force"
+
+          - file:
+                  path: "/{{ data_dir }}"
+                  state: directory
+
+          - template:
+                  src: "/etc/hadoop/core-site.xml"
+                  dest: "/etc/hadoop/core-site.xml"
+          - template:
+                  src: "/root/hdfs-site.xml"
+                  dest: "/etc/hadoop/hdfs-site.xml"
+          - shell:
+                 cmd: "hadoop-daemon.sh start datanode"
+                                         
